@@ -3,7 +3,7 @@ namespace Utilities.Lerpers
 {
    public static class LerpUtils
    {
-      public static float TimedLerp(float from, float to, ref float elapsed, float duration, bool forward)
+      public static float TimedLerp(float from, float to, ref float elapsed, float duration, bool forward = true)
       {
          if (forward)
          {
