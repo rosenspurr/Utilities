@@ -6,73 +6,87 @@ namespace Utilities.Rendering
 {
 	public static class RenderingUtils
 	{
-		public static void ToggleMeshRendererRecursive(Transform p, bool enable)
+
+		public static void SetLayerRecursive(Transform root, int layer)
 		{
-			MeshRenderer meshRenderer = p.GetComponent<MeshRenderer>();
-			if (meshRenderer != null)
-				meshRenderer.enabled = enable;
+			if (root == null) return;
 
-			SkinnedMeshRenderer skinnedRenderer = p.GetComponent<SkinnedMeshRenderer>();
-			if (skinnedRenderer != null)
-				skinnedRenderer.enabled = enable;
+			root.gameObject.layer = layer;
 
-			foreach (Transform child in p)
+			foreach (Transform child in root)
 			{
-				ToggleMeshRendererRecursive(child, enable);
+				SetLayerRecursive(child, layer);
 			}
 		}
 
-		public static bool IsMeshRendererEnabled(Transform p)
-		{
-			MeshRenderer meshRenderer = p.GetComponent<MeshRenderer>();
-			if (meshRenderer != null && !meshRenderer.enabled)
-				return false;
 
-			SkinnedMeshRenderer skinnedRenderer = p.GetComponent<SkinnedMeshRenderer>();
-			if (skinnedRenderer != null && !skinnedRenderer.enabled)
-				return false;
+        public static void ToggleMeshRendererRecursive(Transform p, bool enable)
+        {
+            MeshRenderer meshRenderer = p.GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+                meshRenderer.enabled = enable;
 
-			foreach (Transform child in p)
-			{
-				if (!IsMeshRendererEnabled(child))
-					return false;
-			}
+            SkinnedMeshRenderer skinnedRenderer = p.GetComponent<SkinnedMeshRenderer>();
+            if (skinnedRenderer != null)
+                skinnedRenderer.enabled = enable;
 
-			return true;
-		}
+            foreach (Transform child in p)
+            {
+                ToggleMeshRendererRecursive(child, enable);
+            }
+        }
 
-		public static void SetAlphaRecursive(Transform p, float alpha)
-		{
-			foreach (Transform child in p)
-			{
-				MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
-				if (meshRenderer != null)
-				{
-					foreach (Material mat in meshRenderer.materials)
-					{
-						Color color = mat.color;
-						color.a = alpha;
-						mat.color = color;
-					}
-				}
+        public static bool IsMeshRendererEnabled(Transform p)
+        {
+            MeshRenderer meshRenderer = p.GetComponent<MeshRenderer>();
+            if (meshRenderer != null && !meshRenderer.enabled)
+                return false;
 
-				SetAlphaRecursive(child, alpha);
-			}
-		}
+            SkinnedMeshRenderer skinnedRenderer = p.GetComponent<SkinnedMeshRenderer>();
+            if (skinnedRenderer != null && !skinnedRenderer.enabled)
+                return false;
 
-		public static void SetRecursiveColor(Transform p, Color color)
-		{
-			foreach (Transform child in p)
-			{
-				MaskableGraphic mg = child.GetComponent<MaskableGraphic>();
-				if (mg != null)
-				{
-					mg.color = color;
-				}
+            foreach (Transform child in p)
+            {
+                if (!IsMeshRendererEnabled(child))
+                    return false;
+            }
 
-				SetRecursiveColor(child, color);
-			}
-		}
-	}
+            return true;
+        }
+
+        public static void SetAlphaRecursive(Transform p, float alpha)
+        {
+            foreach (Transform child in p)
+            {
+                MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
+                if (meshRenderer != null)
+                {
+                    foreach (Material mat in meshRenderer.materials)
+                    {
+                        Color color = mat.color;
+                        color.a = alpha;
+                        mat.color = color;
+                    }
+                }
+
+                SetAlphaRecursive(child, alpha);
+            }
+        }
+
+        public static void SetRecursiveColor(Transform p, Color color)
+        {
+            // Apply color to the parent (this transform) if it has a MaskableGraphic
+            MaskableGraphic mg = p.GetComponent<MaskableGraphic>();
+            if (mg != null)
+            {
+                mg.color = color;
+            }
+
+            foreach (Transform child in p)
+            {
+                SetRecursiveColor(child, color);
+            }
+        }
+    }
 }
-
